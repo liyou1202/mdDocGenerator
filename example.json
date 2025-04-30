@@ -1,0 +1,31 @@
+{
+  "title": "取得審核資料",
+  "description": "取得最新一筆審核資料",
+  "path": "/api/tool/review/auditData/{uid}/{roleId}",
+  "protocol": "HTTP",
+  "method": "GET",
+  "headers": [
+      {
+          "key": "Accept",
+          "value": "application/json"
+      },
+      {
+          "key": "Token",
+          "value": "JWT"
+      }
+  ],
+  "response": [
+      {
+          "name": "auditId",
+          "dataType": "string",
+          "description": "回應結果",
+          "note": ""
+      },
+      {
+          "name": "uid",
+          "dataType": "string",
+          "description": "帳號 UID",
+          "note": ""
+      }
+  ]
+}
