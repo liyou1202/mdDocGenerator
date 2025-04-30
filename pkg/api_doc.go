@@ -39,6 +39,7 @@ func (doc *MarkdownDoc) GenerateAPIDoc(apiDoc model.APIDoc) *MarkdownDoc {
 		doc.AddContent(fmt.Sprintf("  - `%s: %s`", header.Key, header.Value)).
 			AddBlankLines(1)
 	}
+	doc.AddBlankLines(2)
 
 	// 請求體
 	if len(apiDoc.Request.Fields) > 0 {
@@ -64,7 +65,7 @@ func (doc *MarkdownDoc) GenerateAPIDoc(apiDoc model.APIDoc) *MarkdownDoc {
 			doc.AddContent(apiDoc.RequestExample).
 				AddBlankLines(1)
 			doc.AddContent("```").
-				AddBlankLines(1)
+				AddBlankLines(3)
 		}
 	}
 
@@ -90,7 +91,7 @@ func (doc *MarkdownDoc) GenerateAPIDoc(apiDoc model.APIDoc) *MarkdownDoc {
 			doc.AddContent(apiDoc.ResponseExample).
 				AddBlankLines(1)
 			doc.AddContent("```").
-				AddBlankLines(1)
+				AddBlankLines(3)
 		}
 	}
 
@@ -104,16 +105,38 @@ func (doc *MarkdownDoc) generateFieldRow(field model.DocField, depth int) {
         required = "Y"
     }
 
-    // 使用 %t 進行表格對齊
-    doc.AddContent(fmt.Sprintf("| %-15s | %-8s | %-10s | %-30s | %-10s |",
-        field.Name,
-        required,
-        field.Type,
-        field.Description,
-        field.Note)).AddBlankLines(1)
+    // 如果是物件類型且有子欄位，創建新的表格
+    if field.Type == "object" && len(field.Fields) > 0 {
+        // 先添加當前欄位到主表格
+        doc.AddContent(fmt.Sprintf("| %-15s | %-8s | %-10s | %-20s | %-10s |",
+            field.Name,
+            required,
+            field.Type,
+            field.Description,
+            field.Note)).AddBlankLines(3)
 
-    // 遞迴處理子欄位
-    for _, subField := range field.Fields {
-        doc.generateFieldRow(subField, depth+1)
+        // 為子欄位創建新的表格
+        doc.AddTitle(fmt.Sprintf("%s", field.Name), 5).
+		AddBlankLines(1)
+
+        // 添加子表格標題
+        doc.AddContent("| name            | required | data type  | description                      | note |").
+            AddBlankLines(1)
+        doc.AddContent("| --------------- | -------- | ---------- | -------------------------------- | ---------- |").
+            AddBlankLines(1)
+
+        // 遞迴處理子欄位
+        for _, subField := range field.Fields {
+            doc.generateFieldRow(subField, 0)
+        }
+        doc.AddBlankLines(1)
+    } else {
+        // 一般欄位直接添加到當前表格
+        doc.AddContent(fmt.Sprintf("| %-15s | %-8s | %-10s | %-20s | %-10s |",
+            field.Name,
+            required,
+            field.Type,
+            field.Description,
+            field.Note)).AddBlankLines(1)
     }
 }
