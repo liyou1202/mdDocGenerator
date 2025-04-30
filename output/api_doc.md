@@ -1,8 +1,8 @@
-### 重設行程
+### 取得詳情
 
-- PATH: `/api/fleet/resetSchedule`
+- PATH: `/api/admin/getSomthing`
 - Protocol: HTTP
-- Method: POST
+- Method: GET
 - Header:
   - `Accept: application/json`
   - `Token: JWT`

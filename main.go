@@ -4,28 +4,19 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/mdDocGenerator/config"
 	"github.com/mdDocGenerator/model"
 	"github.com/mdDocGenerator/pkg"
 )
 
 func main() {
-	template := model.APIDocTemplate{
-		Title:       "重設行程",
-		Description: "",
-		Path:        "/api/fleet/resetSchedule",
-		Protocol:    "HTTP",
-		Method:      "POST",
-		Headers: []model.Header{
-			{Key: "Accept", Value: "application/json"},
-			{Key: "Token", Value: "JWT"},
-		},
+	// 從配置中獲取 API 文檔模板
+	template := config.APITemplates["GET"]
 
-	}
-
-	// Create a new markdown document
+	// 創建新的 markdown 文檔
 	doc := pkg.NewDoc()
 
-	// Convert APIDocTemplate to APIDoc
+	// 構建 API 文檔結構
 	apiDoc := model.APIDoc{
 		Title:       template.Title,
 		Description: template.Description,
@@ -39,24 +30,24 @@ func main() {
 			Fields: []model.DocField{
 				{
 					Name:        "uid",
-                    Required:    false,
+					Required:    false,
 					Type:        "string",
 					Description: "使用者ID",
-                    Note:        "",
+					Note:        "",
 				},
 				{
 					Name:        "deliveryId",
-                    Required:    false,
+					Required:    false,
 					Type:        "array",
 					Description: "配送ID列表",
-                    Note:        "",
+					Note:        "",
 				},
 				{
 					Name:        "comment",
-                    Required:    false,
+					Required:    false,
 					Type:        "string",
 					Description: "重設原因",
-                    Note:        "",
+					Note:        "",
 				},
 				{
 					Name: "base64",
@@ -80,49 +71,36 @@ func main() {
 				},
 			},
 		},
-
-		RequestExample: `{
-	"uid": "",
-	"deliveryId": ["9a23da1b-97eb-48d9-afd3-2f6116f10cf9"],
-	"comment": "重設原因",
-	"base64": {
-		"file": "base 64 encode string",
-		"filename": "name.jpg"
-	}
-}`,
+		RequestExample:  config.RequestExamples["resetSchedule"],
 		Response: model.DocField{
-            Name: "response",
-            Type: "object",
-            Fields: []model.DocField{
-                {
-                    Name:        "success",
-                    Required:    false,
-                    Type:        "boolean",
-                    Description: "是否成功",
-                    Note: "",
-                },
-                {
-                    Name:        "message",
-                    Required:    false,
-                    Type:        "string",
-                    Description: "回應訊息",
-                    Note: "",
-                },
-            },
-        },
-        ResponseExample: `{
-    "success": true,
-    "message": "行程重設成功"
-}`,
+			Name: "response",
+			Type: "object",
+			Fields: []model.DocField{
+				{
+					Name:        "success",
+					Required:    false,
+					Type:        "boolean",
+					Description: "是否成功",
+					Note:        "",
+				},
+				{
+					Name:        "message",
+					Required:    false,
+					Type:        "string",
+					Description: "回應訊息",
+					Note:        "",
+				},
+			},
+		},
+		ResponseExample: config.ResponseExamples["resetSchedule"],
 	}
 
-	// Generate API documentation
+	// 生成 API 文檔
 	doc.GenerateAPIDoc(apiDoc)
 
-	// Export the document
-	err := doc.Export("output/api_doc.md")
-	if err != nil {
-		fmt.Printf("Failed to export document: %v\n", err)
+	// 導出文檔
+	if err := doc.Export("output/api_doc.md"); err != nil {
+		fmt.Printf("導出文檔失敗: %v\n", err)
 		os.Exit(1)
 	}
 }
